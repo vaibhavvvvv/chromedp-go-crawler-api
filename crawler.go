@@ -10,7 +10,7 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-type PartsCSV struct {
+type PartsData struct {
 	Part        string `json:"part,omitempty"`
 	Description string `json:"description,omitempty"`
 	List        string `json:"list,omitempty"`
@@ -20,7 +20,7 @@ type PartsCSV struct {
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-		var res1, res2, res3, res4 string
+		var description, list, corePrice, part string
 
 		key := strings.TrimSpace(r.URL.Query().Get("key"))
 
@@ -45,24 +45,24 @@ func main() {
 			chromedp.Click("td[class=NavSubTab]", chromedp.NodeVisible),
 			chromedp.SendKeys("input[name=pn0]", key),
 			chromedp.Submit("input[name=pn0]"),
-			chromedp.Text("#idC2C_1100001", &res1, chromedp.NodeVisible),
-			chromedp.Text(".PartPrice", &res2, chromedp.NodeVisible),
-			chromedp.Text(".CorePrice", &res3, chromedp.NodeVisible),
-			chromedp.Text("#idPN_1100001", &res4, chromedp.NodeVisible),
+			chromedp.Text("#idC2C_1100001", &description, chromedp.NodeVisible),
+			chromedp.Text(".PartPrice", &list, chromedp.NodeVisible),
+			chromedp.Text(".CorePrice", &corePrice, chromedp.NodeVisible),
+			chromedp.Text("#idPN_1100001", &part, chromedp.NodeVisible),
 		}
 
 		if err := chromedp.Run(ctx, tasks); err != nil {
 			panic(err)
 		}
 
-		PartCSV := PartsCSV{}
+		PartData := PartsData{}
 
-		PartCSV.Description = strings.TrimSpace(res1)
-		PartCSV.List = strings.TrimSpace(res2)
-		PartCSV.CorePrice = strings.TrimSpace(res3)
-		PartCSV.Part = strings.TrimSpace(res4)
+		PartData.Description = strings.TrimSpace(description)
+		PartData.List = strings.TrimSpace(list)
+		PartData.CorePrice = strings.TrimSpace(corePrice)
+		PartData.Part = strings.TrimSpace(part)
 
-		jsonData, err := json.Marshal(PartCSV)
+		jsonData, err := json.Marshal(PartData)
 		if err != nil {
 			panic(err)
 		}
